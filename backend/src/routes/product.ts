@@ -4,6 +4,7 @@ import { Product, Bid, User } from '../orm/index'
 
 import authMiddleware from '../middlewares/auth'
 import { MissingProduct, UserNotGranted } from '~/error/error'
+import { validateRequestBody } from '~/middlewares/body'
 
 const router = express.Router()
   
@@ -18,28 +19,17 @@ router.get('/api/products', async (req, res, next) => {
 })
 
 router.get('/api/products/:productId', async (req, res) => {
-  res.status(200).send()
+  const products = await Product.findByPk(req.params.productId, { attributes: ['id', 'name', 'description', 'category', 'originalPrice', 'pictureUrl', 'endDate', 'sellerId'], include: ['seller', 'bids']})
+  res.json(products).status(200).send()
 })
 
-router.post('/api/products', authMiddleware, async(req, res) => {
+router.post('/api/products', authMiddleware, validateRequestBody(["sellerId"]), async(req, res) => {
   try {
     const products = await Product.create(req.body);
     res.json(products).status(201).send()
   } catch (error) {
-    if (!req.body.sellerId) {
-      return res.status(400).send('Missing sellerId');
-    }
-    if (error === "Invalid or missing fields") {
-      res.status(400).send()
-      console.log("Invalid fields")
-    }
-    if (error === "Unauthorized") {
-      res.status(401).send()
-      console.log("Unauthorized")
-    }
-    else {
-      console.log(error)
-    }
+    console.log(error)
+    res.status(400).send()
   }
 })
 
