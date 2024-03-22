@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize'
 import {Table, Column, Model, HasMany, BelongsTo} from 'sequelize-typescript';
-import {User} from "./user.js";
-import {Bid} from "./bid.js";
+import {User} from "./user";
+import {Bid} from "./bid";
 
 @Table
 export class Product extends Model {

@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize-typescript';
-import {Product} from "./models/product.js";
-import {Bid} from "./models/bid.js";
-import {User} from "./models/user.js";
+import {Product} from "./models/product";
+import {Bid} from "./models/bid";
+import {User} from "./models/user";
 
 export const sequelize = new Sequelize({
     database: 'db',
@@ -9,3 +9,5 @@ export const sequelize = new Sequelize({
     storage: ':memory:',
     models: [Bid, Product, User],
 })
+
+

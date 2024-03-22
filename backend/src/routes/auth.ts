@@ -1,8 +1,8 @@
-import { User } from '../orm/index.js'
+import { User } from '../orm/index'
 import jwt from 'jsonwebtoken'
-import { JWT_SECRET } from '../consts/secret.js'
+import { JWT_SECRET } from '../consts/secret'
 import express from 'express'
-import { getDetails } from '../validators/index.js'
+import { getDetails } from '../validators/index'
 import { Request } from 'express';
 import {Token} from "../types/types";
 

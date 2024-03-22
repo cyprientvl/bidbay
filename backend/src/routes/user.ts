@@ -1,6 +1,6 @@
 import express from 'express'
-import { User, Product, Bid } from '../orm/index.js'
-import { MissingUser } from '../error/error.js'
+import { User, Product, Bid } from '../orm/index'
+import { MissingUser } from '../error/error'
 
 const router = express.Router()
 
@@ -12,7 +12,6 @@ router.get('/api/users/:userId', async (req, res) => {
     console.log(user);
     if(!user) throw new MissingUser()
     return res.status(200).json(user);
-
 
   }catch(e){
 

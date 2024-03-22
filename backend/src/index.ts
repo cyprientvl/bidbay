@@ -1,11 +1,11 @@
 import express from 'express'
-import { initializeDatabase } from './orm/index.js'
-import { regenerateFixtures } from './orm/fixtures/index.js'
-import devRoutes from './routes/dev.js'
-import authRoutes from './routes/auth.js'
-import productRoutes from './routes/product.js'
-import userRoutes from './routes/user.js'
-import bidRoutes from './routes/bid.js'
+import { initializeDatabase } from './orm/index'
+import { regenerateFixtures } from './orm/fixtures/index'
+import devRoutes from './routes/dev'
+import authRoutes from './routes/auth'
+import productRoutes from './routes/product'
+import userRoutes from './routes/user'
+import bidRoutes from './routes/bid'
 import cors from 'cors'
 
 const app = express()

@@ -1,24 +1,27 @@
 {
-  "compilerOptions": {
-    "isolatedModules": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "target": "es2021",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "strict": true,
-    "sourceMap": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "lib": ["es2021", "dom"],
-    "types": ["node"],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
+    "compilerOptions": {
+      "baseUrl": ".",
+      "target": "es2017",
+      "module": "CommonJS",
+      "lib": ["esnext"],
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "strict": true,
+      "strictNullChecks": true,
+      "resolveJsonModule": true,
+      "skipDefaultLibCheck": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "outDir": "./dist",
+      "strictPropertyInitialization": false,
+      "paths": {
+        "~/*": ["./src/*"],
+        "~~/*": ["./*"]
+      }
     },
-    "outDir": "./dist",
-    "allowJs": true,
-    "checkJs": false
-  },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "**/*.ts"],
-}
+    "ts-node": {
+      "require": ["tsconfig-paths/register"]
+    },
+    
+  }
+  
