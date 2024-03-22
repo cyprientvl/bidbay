@@ -3,14 +3,20 @@ import express from 'express'
 import { Product, Bid, User } from '../orm/index'
 
 import authMiddleware from '../middlewares/auth'
+import { MissingProduct, UserNotGranted } from '~/error/error'
 import { validateRequestBody } from '~/middlewares/body'
 import { MissingProduct } from '~/error/error'
 
 const router = express.Router()
   
 router.get('/api/products', async (req, res, next) => {
-  const products = await Product.findAll({ attributes: ['id', 'name', 'description', 'category', 'originalPrice', 'pictureUrl', 'endDate', 'sellerId'], include: ['seller', 'bids']})
-  res.json(products).status(200).send()
+  try{
+    const products = await Product.findAll({ attributes: ['id', 'name', 'description', 'category', 'originalPrice', 'pictureUrl', 'endDate', 'sellerId'], include: ['seller', 'bids']})
+    return res.json(products).status(200).send()
+  }catch(e){
+    return res.status(500).json({error: "Internal server error"})
+  }
+  
 })
 
 router.get('/api/products/:productId', async (req, res) => {
@@ -65,24 +71,29 @@ router.put('/api/products/:productId', async (req, res) =>
 
 
 
-router.delete('/api/products/:productId', async (req, res) =>
+router.delete('/api/products/:productId', authMiddleware, async (req, res) =>
 {
   try {
-    await Product.destroy({
-      where: {
-        id: req.params.productId
-      }
+    
+    const {productId} = req.params;
 
-    });
+    const product = await Product.findOne({where: {id: productId}});
+    if(!product) throw new MissingProduct();
 
-    res.status(200).send();
+    if(product.sellerId != req.user.id && !req.user.admin) throw new UserNotGranted();
+    
+    await product.destroy();
 
+    return res.status(204).end();
   } catch (error) {
+    if(error instanceof MissingProduct){
+      return res.status(404).json({error: "Product not found"})
+    }
+    if(error instanceof UserNotGranted){
+      return res.status(403).json({error: "User not granted"})
+    }
 
-    console.log(error);
-
-    res.status(400).send();
-
+    return res.status(500).json({error: "Internal server error"});
   }
 
 })
