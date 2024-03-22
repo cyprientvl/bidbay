@@ -57,7 +57,7 @@ router.post('/api/auth/register', async (req: Request<Record<string, never>, {ac
 
 router.post('/api/auth/login', async (req: Request<Record<string, never>, {access_token: string} | {error: string; details?: string[]}, {email: string; password: string}>, res) => {
   const { email, password } = req.body
-
+  console.log(email);
   try {
     // Vérifier si l'utilisateur existe
     const user = await User.findOne({
