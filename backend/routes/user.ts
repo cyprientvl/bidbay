@@ -4,7 +4,25 @@ import { User, Product, Bid } from '../orm/index.js'
 const router = express.Router()
 
 router.get('/api/users/:userId', async (req, res) => {
-  res.status(600).send()
+
+  try{
+
+    const user = await User.findByPk(req.params.userId);
+    
+    //if(!user) throw new MissingUser()
+    return res.status(200).json(user);
+
+
+  }catch(e){
+
+    /*if(e instanceof MissingUser){
+      return res.status(404).json({error: "User not found"})
+    }*/
+    return res.status(500).json({error: "Internal server error"})
+  }
+  
+
+  
 })
 
 export default router
