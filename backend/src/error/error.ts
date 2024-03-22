@@ -5,9 +5,8 @@ export class MissingUser extends Error{
     }
 }
 
-export class MissingBid extends Error{
-
-}
+export class MissingBid extends Error{}
+export class MissingProduct extends Error{}
 
 export class BodyError extends Error{
     

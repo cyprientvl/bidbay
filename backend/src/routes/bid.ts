@@ -2,7 +2,7 @@ import authMiddleware from '../middlewares/auth'
 import { Bid, Product } from '../orm/index'
 import express from 'express'
 import { getDetails } from '../validators/index'
-import { MissingBid } from '~/error/error'
+import { MissingBid, MissingProduct } from '~/error/error'
 import { validateRequestBody } from '~/middlewares/body'
 
 const router = express.Router()
@@ -42,11 +42,17 @@ router.post('/api/products/:productId/bids', authMiddleware, validateRequestBody
     const { productId } = req.params;
     const { price } = req.body;
 
+    const product = await Product.findByPk(productId);
+
+    if(!product) throw new MissingProduct();
+
     const bdi = await Bid.create({productId: productId, bidderId: req.user.id, price: price, date: new Date()})
 
     return res.status(201).json(bdi);
   }catch(e){
-    console.log(e);
+    if(e instanceof MissingProduct){
+      return res.status(404).json({error: "Product not found"})
+    }
     return res.status(500).json({error: "Internal server error"})
   }
 
