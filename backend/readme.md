@@ -25,7 +25,7 @@ Le site Web de commerce électronique simplifié permettra aux utilisateurs de c
         id 		    UUID de l'utilisateur 		UUIDv4
         username	Nom d'utilisateur 			chaîne de caractères, unique
         email		Adresse email 				chaîne de caractères, unique
-        password	Mot de passe 				chaîne de caractères, unique
+        password	Mot de pas: se 				chaîne de caractères, unique
         admin		Administrateur 			    booléen
 
     Product:

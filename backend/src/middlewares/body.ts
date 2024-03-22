@@ -1,5 +1,6 @@
 import { NextFunction } from "express";
 import { Request, Response } from 'express';
+import { BodyError } from "~/error/error";
 
 export function validateRequestBody(expectedFields: string[]): 
     (req: Request, res: Response, next: NextFunction) => void {
@@ -12,11 +13,11 @@ export function validateRequestBody(expectedFields: string[]):
                 }
             });
             if (missingFields.length !== 0) {
-                throw new Error(`missing values : ${missingFields.join(', ')}`);
+                throw new BodyError(missingFields);
             }
             next();
         } catch (error) {
-            if(error instanceof Error) return res.status(400).json({ message: error.message });
+            if(error instanceof BodyError) return res.status(400).json({error: "Invalid or missing fields", details: error.missingValue });
             res.status(500).json({ message: "Internal server error" });
         }
     };

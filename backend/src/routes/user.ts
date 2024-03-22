@@ -7,9 +7,12 @@ const router = express.Router()
 router.get('/api/users/:userId', async (req, res) => {
 
   try{
+    const { userId } = req.params;
 
-    const user = await User.findByPk(req.params.userId);
-    console.log(user);
+    const user = await User.findByPk(userId, {attributes: ['id', 'username', 'email', 'admin'],
+      include: [{model: Product,as: 'products',attributes: ['id', 'name', 'description', 'category', 'originalPrice', 'pictureUrl', 'endDate']
+     }, {model: Bid, as: "bids", attributes: ['id', 'price', 'date'], include: [{model: Product, as: "product", attributes: ['id', 'name']}]}]
+     });
     if(!user) throw new MissingUser()
     return res.status(200).json(user);
 
