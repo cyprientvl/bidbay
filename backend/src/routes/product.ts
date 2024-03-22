@@ -4,6 +4,7 @@ import { Product, Bid, User } from '../orm/index'
 
 import authMiddleware from '../middlewares/auth'
 import { validateRequestBody } from '~/middlewares/body'
+import { MissingProduct } from '~/error/error'
 
 const router = express.Router()
   
@@ -13,19 +14,36 @@ router.get('/api/products', async (req, res, next) => {
 })
 
 router.get('/api/products/:productId', async (req, res) => {
-  const products = await Product.findByPk(req.params.productId, { attributes: ['id', 'name', 'description', 'category', 'originalPrice', 'pictureUrl', 'endDate', 'sellerId'], include: ['seller', 'bids']})
-  res.json(products).status(200).send()
-})
-
-router.post('/api/products', authMiddleware, validateRequestBody(["sellerId"]), async(req, res) => {
   try {
-    const products = await Product.create(req.body);
-    res.json(products).status(201).send()
+    const { productId } = req.params;
+    const products = await Product.findByPk(productId);
+    if(!products) throw new MissingProduct();
+    res.json(products).status(200).send()
   } catch (error) {
     console.log(error)
-    res.status(400).send()
+    res.status(404).send()
   }
 })
+router.post('/api/products', authMiddleware, validateRequestBody(["name", "description", "category", "originalPrice", "pictureUrl", "endDate", "sellerId"]), 
+async(req, res) => {
+  try {
+    const productData = {
+      name: req.body.name,
+      description: req.body.description,
+      category: req.body.category,
+      originalPrice: req.body.originalPrice,
+      pictureUrl: req.body.pictureUrl,
+      endDate: req.body.endDate,
+      sellerId: req.body.sellerId
+    };
+
+    const product = await Product.create(productData);
+    res.status(201).json(product);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send();
+  }
+});
 
 
 router.put('/api/products/:productId', async (req, res) =>
