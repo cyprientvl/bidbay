@@ -1,6 +1,6 @@
 import { computed, ref, watch } from "vue";
 import { jwtDecode } from "jwt-decode";
-import {Token} from '../../../backend/types/types'
+import {Token} from '../../../backend/src/types/types'
 
 const token = ref(localStorage.getItem("token") || null);
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { queryGet } from "@/utils/queryAPI";
 
 const loading = ref(false);
 const error = ref(false);
@@ -9,6 +10,8 @@ async function fetchProducts() {
   error.value = false;
 
   try {
+    const response = await queryGet("products");
+    console.log(response);
   } catch (e) {
     error.value = true;
   } finally {
