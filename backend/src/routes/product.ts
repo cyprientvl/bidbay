@@ -59,19 +59,27 @@ async(req, res) => {
 });
 
 
-router.put('/api/products/:productId', async (req, res) =>
+router.put('/api/products/:productId', authMiddleware, async (req, res) =>
 {
   try {
-    const product = await Product.update(req.body,
-{
-      where: {
-        id: req.params.productId
-      }
-    });
-    res.status(200).json(product);
+
+    let product;
+    if(req.user.admin){
+      product = await Product.update(req.body,{where: {id: req.params.productId}});
+    }else{
+      product = await Product.update(req.body,{where: {id: req.params.productId, sellerId: req.user.id}});
+    }
+
+    console.log(product);
+    if(!product[0]) throw new UserNotGranted()
+
+    return res.status(200).json(product);
+
   } catch (error) {
-    console.log(error);
-    res.status(400).send();
+    if(error instanceof UserNotGranted){
+      return res.status(403).json({error: "forbidden, when non owner edit"})
+    }
+    return res.status(400).send();
   }
 })
 
