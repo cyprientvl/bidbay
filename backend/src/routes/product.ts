@@ -68,9 +68,9 @@ router.put('/api/products/:productId', authMiddleware, async (req, res) =>
 
 
     if(req.user.admin){
-      product = await product.update(req.body,{where: {id: req.params.productId}});
+      product = await product.update(req.body);
     }else{
-      product = await product.update(req.body,{where: {id: req.params.productId, sellerId: req.user.id}});
+      product = await product.update(req.body,{where: {sellerId: req.user.id}});
     }
 
     if(!product) throw new UserNotGranted()
