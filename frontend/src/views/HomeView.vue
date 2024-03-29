@@ -1,22 +1,36 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { queryGet } from "@/utils/queryAPI";
+import { Bid } from "@/models/bid";
+import { Product } from "@/models/product";
+import { User } from "@/models/user";
+
+interface HomeViewProduct extends Product{
+  bids: Bid;
+  seller: User;
+}
 
 const loading = ref(false);
 const error = ref(false);
+let list = ref<HomeViewProduct[]>([])
 
 async function fetchProducts() {
   loading.value = true;
   error.value = false;
 
   try {
-    const response = await queryGet("products");
-    console.log(response);
+    const response = await queryGet<HomeViewProduct[]>("products");
+    list.value = response;
+
   } catch (e) {
     error.value = true;
   } finally {
     loading.value = false;
   }
+}
+
+function formatDate(value: Date): string {
+      return new Date(value).toLocaleDateString();
 }
 
 fetchProducts();
@@ -75,11 +89,11 @@ fetchProducts();
       Une erreur est survenue lors du chargement des produits.
     </div>
     <div class="row">
-      <div class="col-md-4 mb-4" v-for="i in 10" data-test-product :key="i">
+      <div class="col-md-4 mb-4" v-for="(item, i) in list" data-test-product :key="i">
         <div class="card">
-          <RouterLink :to="{ name: 'Product', params: { productId: 'TODO' } }">
+          <RouterLink :to="{ name: 'Product', params: { productId: item.id } }">
             <img
-              src="https://picsum.photos/id/403/512/512"
+              :src= item.pictureUrl
               data-test-product-picture
               class="card-img-top"
             />
@@ -88,13 +102,13 @@ fetchProducts();
             <h5 class="card-title">
               <RouterLink
                 data-test-product-name
-                :to="{ name: 'Product', params: { productId: 'TODO' } }"
+                :to="{ name: 'Product', params: { productId: item.id } }"
               >
-                Machine à écrire
+                {{item.name}}
               </RouterLink>
             </h5>
             <p class="card-text" data-test-product-description>
-              Machine à écrire vintage en parfait état de fonctionnement
+              {{item.description}}
             </p>
             <p class="card-text">
               Vendeur :
@@ -102,11 +116,11 @@ fetchProducts();
                 data-test-product-seller
                 :to="{ name: 'User', params: { userId: 'TODO' } }"
               >
-                alice
+                {{item.seller.username}}
               </RouterLink>
             </p>
             <p class="card-text" data-test-product-date>
-              En cours jusqu'au 05/04/2026
+              En cours jusqu'au {{ formatDate(item.endDate) }}
             </p>
             <p class="card-text" data-test-product-price>Prix actuel : 42 €</p>
           </div>
