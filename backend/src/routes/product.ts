@@ -34,7 +34,7 @@ router.get('/api/products/:productId', async (req, res) => {
     return res.status(500).json({error: "Internal server error"})
   }
 })
-router.post('/api/products', authMiddleware, validateRequestBody(["name", "description", "category", "originalPrice", "pictureUrl", "endDate", "sellerId"]), 
+router.post('/api/products', authMiddleware, validateRequestBody(["name", "description", "category", "originalPrice", "pictureUrl", "endDate"]), 
 async(req, res) => {
   try {
     const productData = {
@@ -44,11 +44,11 @@ async(req, res) => {
       originalPrice: req.body.originalPrice,
       pictureUrl: req.body.pictureUrl,
       endDate: req.body.endDate,
-      sellerId: req.body.sellerId
+      sellerId: req.user.id
     };
 
     const product = await Product.create(productData);
-    res.status(201).json(product);
+    return res.status(201).json(product);
   } catch (error) {
     console.log(error);
     res.status(400).send();
