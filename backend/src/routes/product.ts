@@ -98,6 +98,7 @@ router.delete('/api/products/:productId', authMiddleware, async (req, res) =>
 
     if(product.sellerId != req.user.id && !req.user.admin) throw new UserNotGranted();
     
+    await Bid.destroy({where: {productId: req.params.productId}})
     await product.destroy();
 
     return res.status(204).end();
@@ -108,7 +109,7 @@ router.delete('/api/products/:productId', authMiddleware, async (req, res) =>
     if(error instanceof UserNotGranted){
       return res.status(403).json({error: "User not granted"})
     }
-
+    console.log(error)
     return res.status(500).json({error: "Internal server error"});
   }
 
