@@ -19,6 +19,7 @@ router.delete('/api/bids/:bidId', authMiddleware, async (req, res) => {
       bid = await Bid.findOne({ where: { id: bidId, bidderId: req.user.id}});
     }
 
+    console.log(bid);
     if(!bid) throw new MissingBid();
     
     await bid.destroy();
