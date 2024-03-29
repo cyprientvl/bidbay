@@ -17,11 +17,13 @@ router.get('/api/products', async (req, res, next) => {
   
 })
 
-router.get('/api/products/:productId', async (req, res) => {
+router.get('/api/products/:productId',  async (req, res) => {
   try {
     const { productId } = req.params;
 
-    const products = await Product.findByPk(productId);
+    const products = await Product.findByPk(productId, {
+      include: [{model: User,as: 'seller',attributes: ['id', 'username']}]
+    });
 
     if(!products) throw new MissingProduct();
 
@@ -34,6 +36,7 @@ router.get('/api/products/:productId', async (req, res) => {
     return res.status(500).json({error: "Internal server error"})
   }
 })
+
 router.post('/api/products', authMiddleware, validateRequestBody(["name", "description", "category", "originalPrice", "pictureUrl", "endDate"]), 
 async(req, res) => {
   try {
