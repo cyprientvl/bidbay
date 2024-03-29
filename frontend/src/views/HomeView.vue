@@ -6,7 +6,7 @@ import { Product } from "@/models/product";
 import { User } from "@/models/user";
 
 interface HomeViewProduct extends Product{
-  bids: Bid;
+  bids: Bid[];
   seller: User;
 }
 
@@ -21,7 +21,7 @@ async function fetchProducts() {
   try {
     const response = await queryGet<HomeViewProduct[]>("products");
     list.value = response;
-
+    error.value = false;
   } catch (e) {
     error.value = true;
   } finally {
@@ -31,6 +31,14 @@ async function fetchProducts() {
 
 function formatDate(value: Date): string {
       return new Date(value).toLocaleDateString();
+}
+
+function getPrice(item: HomeViewProduct): number{
+  if(item.bids.length == 0){
+    return item.originalPrice;
+  }else{
+    return item.bids[0].price;
+  }
 }
 
 fetchProducts();
@@ -79,13 +87,13 @@ fetchProducts();
       </div>
     </div>
 
-    <div class="text-center mt-4" data-test-loading>
+    <div class="text-center mt-4" data-test-loading v-if="loading">
       <div class="spinner-border" role="status">
         <span class="visually-hidden">Chargement...</span>
       </div>
     </div>
 
-    <div class="alert alert-danger mt-4" role="alert" data-test-error>
+    <div class="alert alert-danger mt-4" role="alert" v-if="error" data-test-error>
       Une erreur est survenue lors du chargement des produits.
     </div>
     <div class="row">
@@ -114,7 +122,7 @@ fetchProducts();
               Vendeur :
               <RouterLink
                 data-test-product-seller
-                :to="{ name: 'User', params: { userId: 'TODO' } }"
+                :to="{ name: 'User', params: { userId: item.seller.id } }"
               >
                 {{item.seller.username}}
               </RouterLink>
@@ -122,7 +130,7 @@ fetchProducts();
             <p class="card-text" data-test-product-date>
               En cours jusqu'au {{ formatDate(item.endDate) }}
             </p>
-            <p class="card-text" data-test-product-price>Prix actuel : 42 €</p>
+            <p class="card-text" data-test-product-price>Prix actuel : {{getPrice(item)}} €</p>
           </div>
         </div>
       </div>

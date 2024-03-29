@@ -1,16 +1,53 @@
 <script setup lang="ts">
 import { useAuthStore } from "../store/auth";
 import { useRouter } from "vue-router";
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { queryPost } from "@/utils/queryAPI";
 
 const { isAuthenticated, token } = useAuthStore();
 const router = useRouter();
+const error = ref(false);
+const loading = ref(false);
+
+
+const inputProductName = ref<string>("");
+const inputProductDescription = ref<string>("");
+const inputProductCategorie = ref<string>("");
+const inputProductStartPrice = ref<number>(0);
+const inputProductUrl = ref<string>("");
+const inputProductEndDate = ref<string>("");
+
 
 if (!isAuthenticated.value) {
   router.push({ name: "Login" });
 }
+async function addProduct(){
+  try{
+    loading.value = true;
+    await queryPost("products", 
+    {name: inputProductName.value, description: inputProductDescription.value,category: inputProductCategorie.value,originalPrice: inputProductStartPrice.value ,pictureUrl: inputProductUrl.value ,endDate: inputProductEndDate.value})
+    error.value = false;
+  }catch(e){
+    error.value = true;
+  }finally{
+    loading.value = false;
+  }
+}
 
-// router.push({ name: "Product", params: { productId: 'TODO } });
+const reversed = computed(() =>{
+
+  if(inputProductCategorie.value.trim() != "" 
+  && inputProductDescription.value.trim() != ""
+  && inputProductCategorie.value.trim() != ""
+  && inputProductStartPrice.value != 0
+  && inputProductUrl.value.trim() != ""
+  && inputProductEndDate.value.trim() != ""
+  ) return true;
+  return false
+
+} )
+
+
 </script>
 
 <template>
@@ -19,7 +56,7 @@ if (!isAuthenticated.value) {
   <div class="row justify-content-center">
     <div class="col-md-6">
       <form>
-        <div class="alert alert-danger mt-4" role="alert" data-test-error>
+        <div class="alert alert-danger mt-4" role="alert" data-test-error v-if="error">
           Une erreur s'est produite
         </div>
 
@@ -29,6 +66,7 @@ if (!isAuthenticated.value) {
             type="text"
             class="form-control"
             id="product-name"
+            v-model="inputProductName"
             required
             data-test-product-name
           />
@@ -42,6 +80,7 @@ if (!isAuthenticated.value) {
             class="form-control"
             id="product-description"
             name="description"
+            v-model="inputProductDescription"
             rows="3"
             required
             data-test-product-description
@@ -54,6 +93,7 @@ if (!isAuthenticated.value) {
             type="text"
             class="form-control"
             id="product-category"
+            v-model="inputProductCategorie"
             required
             data-test-product-category
           />
@@ -71,6 +111,7 @@ if (!isAuthenticated.value) {
               name="originalPrice"
               step="1"
               min="0"
+              v-model="inputProductStartPrice"
               required
               data-test-product-price
             />
@@ -88,6 +129,7 @@ if (!isAuthenticated.value) {
             id="product-picture-url"
             name="pictureUrl"
             required
+            v-model="inputProductUrl"
             data-test-product-picture
           />
         </div>
@@ -102,19 +144,20 @@ if (!isAuthenticated.value) {
             id="product-end-date"
             name="endDate"
             required
+            v-model="inputProductEndDate"
             data-test-product-end-date
           />
         </div>
 
         <div class="d-grid gap-2">
-          <button
+          <button v-on:click="addProduct()"
             type="submit"
             class="btn btn-primary"
-            disabled
+            :disabled = !reversed
             data-test-submit
           >
             Ajouter le produit
-            <span
+            <span v-if="loading"
               data-test-spinner
               class="spinner-border spinner-border-sm"
               role="status"

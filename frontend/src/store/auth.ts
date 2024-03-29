@@ -29,6 +29,8 @@ const isAdmin = computed(() => userData.value !== null && userData.value.admin);
 
 const username = computed(() => userData.value?.username ?? '');
 
+const userId = computed(() => userData.value?.id ?? '');
+
 export function useAuthStore() {
   return {
     userData,
@@ -36,6 +38,7 @@ export function useAuthStore() {
     isAuthenticated,
     isAdmin,
     username,
+    userId,
     login,
     logout,
   };
