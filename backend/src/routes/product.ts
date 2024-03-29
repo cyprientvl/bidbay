@@ -22,7 +22,7 @@ router.get('/api/products/:productId',  async (req, res) => {
     const { productId } = req.params;
 
     const products = await Product.findByPk(productId, {
-      include: [{model: User,as: 'seller',attributes: ['id', 'username']}]
+      include: [{model: User,as: 'seller',attributes: ['id', 'username']}, {model: Bid, as: 'bids', attributes: ['id', 'price', 'date'], include: [{model: User, as: 'bidder', attributes: ['id', 'username']}]}]
     });
 
     if(!products) throw new MissingProduct();
