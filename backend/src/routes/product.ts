@@ -66,15 +66,10 @@ router.put('/api/products/:productId', authMiddleware, async (req, res) =>
     let product = await Product.findByPk(req.params.productId);
     if(!product) throw new MissingProduct();
 
+    if(product.sellerId != req.user.id && !req.user.admin) throw new UserNotGranted()
 
-    if(req.user.admin){
-      product = await product.update(req.body);
-    }else{
-      product = await product.update(req.body,{where: {sellerId: req.user.id}});
-    }
-
-    if(!product) throw new UserNotGranted()
-
+    product = await product.update(req.body);
+    
     return res.status(200).json(product);
 
   } catch (error) {
