@@ -63,15 +63,17 @@ router.put('/api/products/:productId', authMiddleware, async (req, res) =>
 {
   try {
 
-    let product;
+    let product = await Product.findByPk(req.params.productId);
+    if(!product) throw new MissingProduct();
+
+
     if(req.user.admin){
-      product = await Product.update(req.body,{where: {id: req.params.productId}});
+      product = await product.update(req.body,{where: {id: req.params.productId}});
     }else{
-      product = await Product.update(req.body,{where: {id: req.params.productId, sellerId: req.user.id}});
+      product = await product.update(req.body,{where: {id: req.params.productId, sellerId: req.user.id}});
     }
 
-    console.log(product);
-    if(!product[0]) throw new UserNotGranted()
+    if(!product) throw new UserNotGranted()
 
     return res.status(200).json(product);
 
@@ -79,6 +81,10 @@ router.put('/api/products/:productId', authMiddleware, async (req, res) =>
     if(error instanceof UserNotGranted){
       return res.status(403).json({error: "forbidden, when non owner edit"})
     }
+    if(error instanceof MissingProduct){
+      return res.status(404).json({error: "not found"});
+    }
+
     return res.status(400).send();
   }
 })
