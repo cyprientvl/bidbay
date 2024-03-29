@@ -42,4 +42,4 @@ async function queryPut<Type>(url: string, data: any){
     return response.data;
 }
 
-export { queryGet };
+export { queryGet, queryPost, queryPut, queryDelete };
