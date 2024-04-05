@@ -4,16 +4,20 @@ import { queryGet } from "@/utils/queryAPI";
 import { Bid } from "@/models/bid";
 import { Product } from "@/models/product";
 import { User } from "@/models/user";
+import { H } from "vite/dist/node/types.d-aGj9QkWt";
 
 interface HomeViewProduct extends Product{
   bids: Bid[];
   seller: User;
+  name: string;
 }
 
 const loading = ref(false);
 const error = ref(false);
+const selectedFilter = ref<string>("");
 let list = ref<HomeViewProduct[]>([])
-
+let sortNameList = ref<HomeViewProduct[]>([])
+let sortNumberList = ref<HomeViewProduct[]>([])
 async function fetchProducts() {
   loading.value = true;
   error.value = false;
@@ -30,11 +34,10 @@ async function fetchProducts() {
 }
 
 function formatDate(value: Date): string {
-      return new Date(value).toLocaleDateString();
+  return new Date(value).toLocaleDateString();
 }
 
 function getPrice(item: HomeViewProduct): number{
-  console.log(item.bids.length + "ddf")
   if(item.bids.length == 0){
     return item.originalPrice;
   }else{
@@ -42,29 +45,17 @@ function getPrice(item: HomeViewProduct): number{
   }
 }
 
-
-function doFilterName(value: string) {
-  if (value === "") {
-    fetchProducts();
-    return;
+const sortedProducts = computed(() => {
+  if (selectedFilter.value === "Nom") {
+    console.log("name")
+    return [...list.value].sort((a, b) => a.name.localeCompare(b.name));
+  } else if (selectedFilter.value === "Prix") {
+    console.log("price")
+    return [...list.value].sort((a, b) => getPrice(a) - getPrice(b));
+  } else {
+    return list.value;
   }
-
-  list.value = list.value.filter((item) => {
-    return item.name.toLowerCase().includes(value.toLowerCase());
-  });
-}
-
-function doFilterPrice(value: number) {
-  if (value === 0) {
-    fetchProducts();
-    return;
-  }
-
-  list.value = list.value.filter((item) => {
-    return item.originalPrice.toLowerCase().includes(value.toLowerCase());
-  });
-}
-
+});
 fetchProducts();
 </script>
 
@@ -76,6 +67,7 @@ fetchProducts();
       <div class="col-md-6">
         <form>
           <div class="input-group">
+            
             <span class="input-group-text">Filtrage</span>
             <input
               type="text"
@@ -95,14 +87,15 @@ fetchProducts();
             aria-expanded="false"
             data-test-sorter
           >
-            Trier par nom
+            Trier par {{ selectedFilter ? selectedFilter : 'Default' }}
           </button>
+
           <ul class="dropdown-menu dropdown-menu-end">
             <li>
-              <a class="dropdown-item" href="#"> Nom </a>
+              <a class="dropdown-item" href="#" @click="selectedFilter = 'Nom'"> Nom </a>
             </li>
             <li>
-              <a class="dropdown-item" href="#" data-test-sorter-price>
+              <a class="dropdown-item" href="#" @click="selectedFilter = 'Prix'" data-test-sorter-price>
                 Prix
               </a>
             </li>
@@ -121,7 +114,7 @@ fetchProducts();
       Une erreur est survenue lors du chargement des produits.
     </div>
     <div class="row">
-      <div class="col-md-4 mb-4" v-for="(item, i) in list" data-test-product :key="i">
+      <div class="col-md-4 mb-4" v-for="(item, i) in sortedProducts" data-test-product :key="i">
         <div class="card">
           <RouterLink :to="{ name: 'Product', params: { productId: item.id } }">
             <img
