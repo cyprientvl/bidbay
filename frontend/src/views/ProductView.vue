@@ -211,7 +211,7 @@ function formatDate(date: Date) {
         </ul>
 
         <h2 class="mb-3">Offres sur le produit</h2>
-        <table class="table table-striped" data-test-bids>
+        <table v-if="product.bids.length === 0" class="table table-striped" data-test-bids>
           <thead>
             <tr>
               <th scope="col">Enchérisseur</th>
