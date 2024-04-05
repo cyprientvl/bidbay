@@ -175,7 +175,7 @@ function formatDate(date: Date) {
               {{product.name}}
             </h1>
           </div>
-          <div class="col-lg-6 text-end" v-if="product.sellerId == useAuthStore().userId.value || useAuthStore().isAdmin">
+          <div class="col-lg-6 text-end" v-if="product.sellerId == useAuthStore().userId.value || useAuthStore().isAdmin.value">
             <RouterLink
               :to="{ name: 'ProductEdition', params: { productId: product.id } }"
               class="btn btn-primary"
@@ -232,7 +232,7 @@ function formatDate(date: Date) {
               <td data-test-bid-price>{{item.price}} €</td>
               <td data-test-bid-date>{{formatDate(item.date)}}</td>
               <td >
-                <button v-if="item.bidder.id == useAuthStore().userId.value || useAuthStore().isAdmin" v-on:click="deleteBid(item.id, i)" class="btn btn-danger btn-sm" data-test-delete-bid>
+                <button v-if="item.bidder.id == useAuthStore().userId.value || useAuthStore().isAdmin.value" v-on:click="deleteBid(item.id, i)" class="btn btn-danger btn-sm" data-test-delete-bid>
                   Supprimer
                 </button>
               </td>
