@@ -4,15 +4,63 @@ import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { useAuthStore } from "../store/auth";
-import { Bid } from "@/models/bid";
 import { User } from "@/models/user";
 import { queryGet } from "@/utils/queryAPI";
 import { Product } from "@/models/product";
+import { Bid } from "@/models/bid";
 
 
-interface UserViewProduct extends Product {
-  bids: Bid;
-  seller: User;
+interface UserViewBid {
+  id: string;
+  username: string;
+  email: string;
+  admin: boolean;
+  bids: BidView[];
+  products: ProductsView[];
+}
+
+interface ProductsView extends Product{
+
+}
+
+interface ProductView {
+  id: string;
+  name: string;
+}
+
+interface BidView {
+  id: string;
+  bidAmount: number;
+  bidDate: string;
+  product: ProductView[];
+}
+
+
+
+interface UserViewProduct {
+  id: string;
+  category: string;
+  description: string;
+  endDate: string;
+  name: string;
+  originalPrice: number;
+  pictureUrl: string;
+  seller: {
+    admin: boolean;
+    createdAt: string;
+    email: string;
+    id: string;
+    password: string;
+    updatedAt: string;
+    username: string;
+  };
+  bids: {
+    bidAmount: number;
+    bidDate: string;
+    id: string;
+    product: string;
+  }
+  sellerId: string;
 }
 
 const { isAuthenticated, userData } = useAuthStore();
@@ -23,21 +71,19 @@ const user = ref<User | null>(null);
 
 const loading = ref(false);
 const error = ref(false);
+let userId = computed(() => route.params.userId);
 let listProduct = ref<UserViewProduct[]>([])
+let bids = ref<UserViewBid[]>([]);
 
-let bids = ref<Bid[]>([]);
-
-async function fetchBids(userId: string) {
+async function fetchBids() {
   try {
-    const response = await queryGet<Bid[]>(`users/${userId}/bids`);
+    const response = await queryGet<UserViewBid[]>(`users/${userData.value?.id}`);
     bids.value = response;
+    console.log(response);
   } catch (e) {
     console.error(e);
   }
 }
-
-let userId = computed(() => route.params.userId);
-console.log(userId.value);
 
 async function fetchUser() {
   try {
@@ -66,11 +112,7 @@ async function fetchProducts() {
 onMounted(() => {
   fetchUser();
   fetchProducts();
-  if (typeof userId.value === 'string') {
-    fetchBids(userId.value);
-  } else if (Array.isArray(userId.value)) {
-    fetchBids(userId.value[0]);
-  }
+  fetchBids();
 });
 
 function formatDate(value: Date): string {
@@ -98,7 +140,7 @@ function formatDate(value: Date): string {
           <div class="row">
             <div class="col-md-6 mb-6 py-2" v-for="(item, i) in listProduct" :key="i" data-test-product>
               <div class="card">
-                <RouterLink :to="{ name: 'Product', params: { productId: item.id} }">
+                <RouterLink :to="{ name: 'Product', params: { productId: item.id }}">
                   <img
                     :src="item.pictureUrl"
                     class="card-img-top" data-test-product-picture />
@@ -134,16 +176,16 @@ function formatDate(value: Date): string {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, i) in user" :key="i" data-test-bid>
+              <tr v-for="(item, i) in bids" :key="i" data-test-bid>
                 <td>
                   <RouterLink :to="{
         name: 'Product',
         params: { productId: 'TODO' },
       }" data-test-bid-product>
-                    Théière design
+                    {{ item.bids.}}
                   </RouterLink>
                 </td>
-                <td data-test-bid-price>55 €</td>
+                <td data-test-bid-price>{{ item.bids }} €</td>
                 <td data-test-bid-date>{{ formatDate(new Date()) }}</td>
               </tr>
             </tbody>
