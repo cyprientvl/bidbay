@@ -61,6 +61,7 @@ async(req, res) => {
 
 router.put('/api/products/:productId', authMiddleware, async (req, res) =>
 {
+  console.log(req.body)
   try {
 
     let product = await Product.findByPk(req.params.productId);
@@ -70,9 +71,12 @@ router.put('/api/products/:productId', authMiddleware, async (req, res) =>
 
     product = await product.update(req.body);
     
+    console.log("end");
+    console.log(product);
     return res.status(200).json(product);
 
   } catch (error) {
+    console.log(error)
     if(error instanceof UserNotGranted){
       return res.status(403).json({error: "forbidden, when non owner edit"})
     }

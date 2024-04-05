@@ -25,6 +25,12 @@ async function main () {
   await initializeDatabase()
   await regenerateFixtures()
 
+  app.use((req, res, next)=>{
+    console.log("call to the api");
+    next();
+  })
+  console.log("call")
+
   app.use(devRoutes)
   app.use(authRoutes)
   app.use(productRoutes)
