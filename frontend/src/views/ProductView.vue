@@ -63,6 +63,9 @@ const reversed = computed(() => newPrice.value >= 10 && newPrice.value > getMaxB
 function timeLeft(date: Date){
     const d = new Date(date);
     const maintenant = new Date();
+
+    if(maintenant.getTime() > d.getTime()) return "Terminé"
+
     const differenceEnMilliseconds = Math.abs(maintenant.getTime() - d.getTime());
     const jours = Math.floor(differenceEnMilliseconds / (1000 * 60 * 60 * 24));
     const heures = Math.floor((differenceEnMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
