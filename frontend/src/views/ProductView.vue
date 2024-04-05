@@ -209,9 +209,8 @@ function formatDate(date: Date) {
             </router-link>
           </li>
         </ul>
-
         <h2 class="mb-3">Offres sur le produit</h2>
-        <table class="table table-striped" data-test-bids v-if="product.bids.length == 0">
+        <table class="table table-striped" data-test-bids v-if="product.bids.length != 0">
           <thead>
             <tr>
               <th scope="col">Enchérisseur</th>
