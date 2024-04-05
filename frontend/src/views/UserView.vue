@@ -182,7 +182,7 @@ function formatDate(value: Date): string {
         name: 'Product',
         params: { productId: 'TODO' },
       }" data-test-bid-product>
-                    {{ item.bids.}}
+                    {{ item.bids}}
                   </RouterLink>
                 </td>
                 <td data-test-bid-price>{{ item.bids }} €</td>
