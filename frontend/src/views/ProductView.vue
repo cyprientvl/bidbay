@@ -146,7 +146,7 @@ function formatDate(date: Date) {
     <div class="alert alert-danger mt-4" role="alert" data-test-error v-if="error">
       Une erreur est survenue lors du chargement des produits.
     </div>
-    <div class="row" data-test-product>
+    <div class="row" data-test-product v-if="!loading">
       <!-- Colonne de gauche : image et compte à rebours -->
       <div class="col-lg-4">
         <img
