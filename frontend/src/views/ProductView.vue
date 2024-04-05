@@ -58,7 +58,7 @@ async function getProduct(){
   }
 }
 
-const reversed = computed(() => newPrice.value >= 10 && newPrice.value > getMaxBid())
+const reversed = computed(() => newPrice.value > getMaxBid() && newPrice.value > getMaxBid())
 
 function timeLeft(date: Date){
     const d = new Date(date);
@@ -175,7 +175,7 @@ function formatDate(date: Date) {
               {{product.name}}
             </h1>
           </div>
-          <div class="col-lg-6 text-end" v-if="product.sellerId == useAuthStore().userId.value">
+          <div class="col-lg-6 text-end" v-if="product.sellerId == useAuthStore().userId.value || useAuthStore().isAdmin">
             <RouterLink
               :to="{ name: 'ProductEdition', params: { productId: product.id } }"
               class="btn btn-primary"
@@ -211,7 +211,7 @@ function formatDate(date: Date) {
         </ul>
 
         <h2 class="mb-3">Offres sur le produit</h2>
-        <table class="table table-striped" data-test-bids>
+        <table class="table table-striped" data-test-bids v-if="product.bids.length == 0">
           <thead>
             <tr>
               <th scope="col">Enchérisseur</th>
@@ -233,7 +233,7 @@ function formatDate(date: Date) {
               <td data-test-bid-price>{{item.price}} €</td>
               <td data-test-bid-date>{{formatDate(item.date)}}</td>
               <td >
-                <button v-if="item.bidder.id == useAuthStore().userId.value" v-on:click="deleteBid(item.id, i)" class="btn btn-danger btn-sm" data-test-delete-bid>
+                <button v-if="item.bidder.id == useAuthStore().userId.value || useAuthStore().isAdmin" v-on:click="deleteBid(item.id, i)" class="btn btn-danger btn-sm" data-test-delete-bid>
                   Supprimer
                 </button>
               </td>
@@ -253,7 +253,7 @@ function formatDate(date: Date) {
               data-test-bid-form-price
             />
             <small class="form-text text-muted">
-              Le montant doit être supérieur à 10 €.
+              Le montant doit être supérieur à {{ getMaxBid() }} €.
             </small>
           </div>
           <button
