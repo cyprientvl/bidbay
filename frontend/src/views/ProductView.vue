@@ -70,7 +70,7 @@ function timeLeft(date: Date){
     const jours = Math.floor(differenceEnMilliseconds / (1000 * 60 * 60 * 24));
     const heures = Math.floor((differenceEnMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((differenceEnMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
-    return `${jours} j / ${heures} h / ${minutes} m`
+    return `${jours}j ${heures}h ${minutes}min`
 }
 
 function getMaxBid(): number{
