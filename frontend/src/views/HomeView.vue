@@ -15,7 +15,7 @@ interface HomeViewProduct extends Product{
 const loading = ref(false);
 const error = ref(false);
 const searchTerm = ref<string>("");
-const selectedFilter = ref<string>("");
+const selectedFilter = ref<string>("nom");
 let list = ref<HomeViewProduct[]>([])
 let sortNameList = ref<HomeViewProduct[]>([])
 let sortNumberList = ref<HomeViewProduct[]>([])
@@ -48,17 +48,17 @@ function getPrice(item: HomeViewProduct): number{
 
 const filteredProducts = computed(() => {
   if (searchTerm.value) {
-    return list.value.filter(product => product.name.includes(searchTerm.value));
+    return list.value.filter(product => product.name.toLowerCase().includes(searchTerm.value.toLowerCase()));
   } else {
     return list.value;
   }
 });
 
 const sortedProducts = computed(() => {
-  if (selectedFilter.value === "Nom") {
+  if (selectedFilter.value === "nom") {
     console.log("name")
     return [...filteredProducts.value].sort((a, b) => a.name.localeCompare(b.name));
-  } else if (selectedFilter.value === "Prix") {
+  } else if (selectedFilter.value === "prix") {
     console.log("price")
     return [...filteredProducts.value].sort((a, b) => getPrice(a) - getPrice(b));
   } else {
@@ -97,15 +97,15 @@ fetchProducts();
             aria-expanded="false"
             data-test-sorter
           >
-            Trier par {{ selectedFilter ? selectedFilter : 'Default' }}
+            Trier par {{ selectedFilter ? selectedFilter : 'nom' }}
           </button>
 
           <ul class="dropdown-menu dropdown-menu-end">
             <li>
-              <a class="dropdown-item" href="#" @click="selectedFilter = 'Nom'"> Nom </a>
+              <a class="dropdown-item" href="#" @click="selectedFilter = 'nom'"> Nom </a>
             </li>
             <li>
-              <a class="dropdown-item" href="#" @click="selectedFilter = 'Prix'" data-test-sorter-price>
+              <a class="dropdown-item" href="#" @click="selectedFilter = 'prix'" data-test-sorter-price>
                 Prix
               </a>
             </li>
