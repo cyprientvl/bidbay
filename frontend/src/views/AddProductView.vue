@@ -153,7 +153,7 @@ const reversed = computed(() =>{
         </div>
 
         <div class="d-grid gap-2">
-          <button v-on:click="addProduct()"
+          <button v-on:click.prevent="addProduct()"
             type="submit"
             class="btn btn-primary"
             :disabled = !reversed
