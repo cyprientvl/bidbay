@@ -3,6 +3,7 @@ import { useAuthStore } from "../store/auth";
 import { useRouter } from "vue-router";
 import { ref, computed } from "vue";
 import { queryPost } from "@/utils/queryAPI";
+import { Product } from "@/models/product";
 
 const { isAuthenticated, token } = useAuthStore();
 const router = useRouter();
@@ -24,8 +25,10 @@ if (!isAuthenticated.value) {
 async function addProduct(){
   try{
     loading.value = true;
-    await queryPost("products", 
-    {name: inputProductName.value, description: inputProductDescription.value,category: inputProductCategorie.value,originalPrice: inputProductStartPrice.value ,pictureUrl: inputProductUrl.value ,endDate: inputProductEndDate.value})
+    const response = await queryPost<Product>("products", {name: inputProductName.value, description: inputProductDescription.value,category: inputProductCategorie.value,originalPrice: inputProductStartPrice.value ,pictureUrl: inputProductUrl.value ,endDate: inputProductEndDate.value})
+    console.log(response);
+    router.push(`/products/${response.id}`)
+    
     error.value = false;
   }catch(e){
     error.value = true;
