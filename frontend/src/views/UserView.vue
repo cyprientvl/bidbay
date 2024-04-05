@@ -9,58 +9,36 @@ import { queryGet } from "@/utils/queryAPI";
 import { Product } from "@/models/product";
 import { Bid } from "@/models/bid";
 
-
-interface UserViewBid {
-  id: string;
-  username: string;
-  email: string;
-  admin: boolean;
-  bids: BidView[];
-  products: ProductsView[];
+interface HomeViewProduct extends Product{
+  bids: Bid[];
+  seller: User;
 }
 
-interface ProductsView extends Product{
-
+interface ViewUser extends User{
+  products: ViewProduct[];
+  seller: User;
 }
 
-interface ProductView {
-  id: string;
-  name: string;
+interface ViewProduct {
+  id: string,
+  name: string,
+  description: string,
+  category: string,
+  originalPrice: number,
+  pictureUrl: string,
+  endDate: Date,
+  sellerId: string
+  bids: ViewProductBid[];
 }
 
-interface BidView {
+interface ViewProductBid {
+  date: Date;
   id: string;
-  bidAmount: number;
-  bidDate: string;
-  product: ProductView[];
-}
-
-
-
-interface UserViewProduct {
-  id: string;
-  category: string;
-  description: string;
-  endDate: string;
-  name: string;
-  originalPrice: number;
-  pictureUrl: string;
-  seller: {
-    admin: boolean;
-    createdAt: string;
-    email: string;
+  price: number;
+  products: {
     id: string;
-    password: string;
-    updatedAt: string;
-    username: string;
+    name: string;
   };
-  bids: {
-    bidAmount: number;
-    bidDate: string;
-    id: string;
-    product: string;
-  }
-  sellerId: string;
 }
 
 const { isAuthenticated, userData } = useAuthStore();
@@ -72,18 +50,8 @@ const user = ref<User | null>(null);
 const loading = ref(false);
 const error = ref(false);
 let userId = computed(() => route.params.userId);
-let listProduct = ref<UserViewProduct[]>([])
-let bids = ref<UserViewBid[]>([]);
-
-async function fetchBids() {
-  try {
-    const response = await queryGet<UserViewBid[]>(`users/${userData.value?.id}`);
-    bids.value = response;
-    console.log(response);
-  } catch (e) {
-    console.error(e);
-  }
-}
+let listBid = ref<ViewUser[]>([])
+let listProduct = ref<HomeViewProduct[]>([])
 
 async function fetchUser() {
   try {
@@ -99,9 +67,9 @@ async function fetchProducts() {
   error.value = false;
 
   try {
-    const response = await queryGet<UserViewProduct[]>("products");
+    const response = await queryGet<HomeViewProduct[]>("products");
     listProduct.value = response;
-
+    error.value = false;
   } catch (e) {
     error.value = true;
   } finally {
@@ -109,10 +77,25 @@ async function fetchProducts() {
   }
 }
 
+
+async function fetchBid() {
+  loading.value = true;
+  error.value = false;
+
+  try {
+    const response = await queryGet<ViewUser[]>("products");
+      listBid.value = response;
+    error.value = false;
+  } catch (e) {
+    error.value = true;
+  } finally {
+    loading.value = false;
+  }
+}
 onMounted(() => {
+  fetchBid();
   fetchUser();
   fetchProducts();
-  fetchBids();
 });
 
 function formatDate(value: Date): string {
@@ -176,13 +159,17 @@ function formatDate(value: Date): string {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, i) in bids" :key="i" data-test-bid>
+              <tr v-for="(item, i) in listProduct" :key="i" data-test-bid>
                 <td>
                   <RouterLink :to="{
         name: 'Product',
         params: { productId: 'TODO' },
       }" data-test-bid-product>
+<<<<<<< HEAD
+                    {{ item.category }}
+=======
                     {{ item.bids}}
+>>>>>>> 3652fbfc7cb4653e1a3db9af00d2783d03284ad5
                   </RouterLink>
                 </td>
                 <td data-test-bid-price>{{ item.bids }} €</td>
