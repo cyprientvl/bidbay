@@ -33,7 +33,7 @@ async function queryPost<Type>(url: string, data: any){
 }
 
 async function queryPut<Type>(url: string, data: any){
-    const response = await axios.put<Type>(`${URLAPI}/${url}`, data, {
+    const response = await axios.put(`${URLAPI}/${url}`, data, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${useAuthStore().token.value}`
