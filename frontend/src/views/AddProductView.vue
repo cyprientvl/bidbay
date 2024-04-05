@@ -45,6 +45,7 @@ const reversed = computed(() =>{
   && inputProductStartPrice.value != 0
   && inputProductUrl.value.trim() != ""
   && inputProductEndDate.value.trim() != ""
+  && loading.value == false
   ) return true;
   return false
 

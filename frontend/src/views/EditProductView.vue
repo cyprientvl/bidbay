@@ -13,7 +13,9 @@ const productId = ref(route.params.productId);
 const error = ref<boolean>(false);
 const loading = ref<boolean>(false);
 
-const product = ref<Product>({} as Product);
+const product = ref<Product>({
+  id: "", name: "", description: "", category: "", originalPrice: 0, pictureUrl: "", endDate: new Date(), sellerId: ""
+});
 const productEndDate = ref<string>("");
 
 
