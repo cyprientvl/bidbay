@@ -42,6 +42,29 @@ function getPrice(item: HomeViewProduct): number{
   }
 }
 
+
+function doFilterName(value: string) {
+  if (value === "") {
+    fetchProducts();
+    return;
+  }
+
+  list.value = list.value.filter((item) => {
+    return item.name.toLowerCase().includes(value.toLowerCase());
+  });
+}
+
+function doFilterPrice(value: number) {
+  if (value === 0) {
+    fetchProducts();
+    return;
+  }
+
+  list.value = list.value.filter((item) => {
+    return item.originalPrice.toLowerCase().includes(value.toLowerCase());
+  });
+}
+
 fetchProducts();
 </script>
 
