@@ -62,6 +62,7 @@ if(product.value.category.trim() != ""
 && product.value.name.trim() != ""
 && product.value.originalPrice != 0
 && product.value.pictureUrl.trim() != ""
+&& loading.value == false
 ) return true;
 return false
 
