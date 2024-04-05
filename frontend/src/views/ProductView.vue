@@ -58,7 +58,7 @@ async function getProduct(){
   }
 }
 
-const reversed = computed(() => newPrice.value >= 10 && newPrice.value > getMaxBid())
+const reversed = computed(() => newPrice.value > getMaxBid() && newPrice.value > getMaxBid())
 
 function timeLeft(date: Date){
     const d = new Date(date);
@@ -70,7 +70,7 @@ function timeLeft(date: Date){
     const jours = Math.floor(differenceEnMilliseconds / (1000 * 60 * 60 * 24));
     const heures = Math.floor((differenceEnMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((differenceEnMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
-    return `${jours} j / ${heures} h / ${minutes} m`
+    return `${jours}j ${heures}h ${minutes}min`
 }
 
 function getMaxBid(): number{
@@ -146,7 +146,7 @@ function formatDate(date: Date) {
     <div class="alert alert-danger mt-4" role="alert" data-test-error v-if="error">
       Une erreur est survenue lors du chargement des produits.
     </div>
-    <div class="row" data-test-product>
+    <div class="row" data-test-product v-if="!loading">
       <!-- Colonne de gauche : image et compte à rebours -->
       <div class="col-lg-4">
         <img
@@ -175,7 +175,7 @@ function formatDate(date: Date) {
               {{product.name}}
             </h1>
           </div>
-          <div class="col-lg-6 text-end" v-if="product.sellerId == useAuthStore().userId.value">
+          <div class="col-lg-6 text-end" v-if="product.sellerId == useAuthStore().userId.value || useAuthStore().isAdmin">
             <RouterLink
               :to="{ name: 'ProductEdition', params: { productId: product.id } }"
               class="btn btn-primary"
@@ -233,7 +233,7 @@ function formatDate(date: Date) {
               <td data-test-bid-price>{{item.price}} €</td>
               <td data-test-bid-date>{{formatDate(item.date)}}</td>
               <td >
-                <button v-if="item.bidder.id == useAuthStore().userId.value" v-on:click="deleteBid(item.id, i)" class="btn btn-danger btn-sm" data-test-delete-bid>
+                <button v-if="item.bidder.id == useAuthStore().userId.value || useAuthStore().isAdmin" v-on:click="deleteBid(item.id, i)" class="btn btn-danger btn-sm" data-test-delete-bid>
                   Supprimer
                 </button>
               </td>
@@ -253,7 +253,7 @@ function formatDate(date: Date) {
               data-test-bid-form-price
             />
             <small class="form-text text-muted">
-              Le montant doit être supérieur à 10 €.
+              Le montant doit être supérieur à {{ getMaxBid() }} €.
             </small>
           </div>
           <button
