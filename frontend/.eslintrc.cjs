@@ -8,8 +8,6 @@ module.exports = {
   extends: [
     'plugin:@typescript-eslint/recommended',
     "plugin:vue/vue3-essential",
-    "eslint:recommended",
-    "@vue/eslint-config-prettier",
     "plugin:cypress/recommended"
   ],
   parserOptions: {
