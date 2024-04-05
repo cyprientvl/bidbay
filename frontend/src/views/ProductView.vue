@@ -23,7 +23,7 @@ interface Bidder{
   username: string
 }
 
-const product = ref<ViewProduct>({} as ViewProduct);
+const product = ref<ViewProduct>();
 
 const route = useRoute();
 const router = useRouter();
@@ -41,6 +41,7 @@ async function getProduct(){
     loading.value = true;
     const responses = await queryGet<ViewProduct>(`products/${productId.value}`);
     product.value = responses;
+    console.log(product.value);
     error.value = false;
   }catch(e){
     error.value = true;
@@ -63,7 +64,7 @@ function timeLeft(date: Date){
 
 function getMaxBid(): number{
   let max = 0
-  product.value.bids.forEach(element =>{
+  product.value?.bids.forEach(element =>{
     if(max < element.price){
       max = element.price
     }
@@ -76,7 +77,7 @@ async function addBid(){
 
   loading.value = true
   try{
-    await queryPost(`products/${product.value.id}/bids`, {price: newPrice.value})
+    await queryPost(`products/${product.value?.id}/bids`, {price: newPrice.value})
     error.value = false;
     
   }catch(e){
@@ -89,7 +90,7 @@ async function addBid(){
 async function deleteProduct() {
   loading.value = true;
   try{
-    await queryDelete(`products/${product.value.id}`)
+    await queryDelete(`products/${product.value?.id}`)
     router.push({ name: "Home" });
     error.value = false;
   }catch(e){
@@ -103,7 +104,7 @@ async function deleteBid(id: string, index: number){
   loading.value = true;
   try{
     await queryDelete(`bids/${id}`)
-    product.value.bids.splice(index, 1);
+    product.value?.bids.splice(index, 1);
     error.value = false;
   }catch(e){
     error.value = true;
@@ -138,7 +139,7 @@ function formatDate(date: Date) {
       <!-- Colonne de gauche : image et compte à rebours -->
       <div class="col-lg-4">
         <img
-          :src= product.pictureUrl
+          :src= product?.pictureUrl
           alt=""
           class="img-fluid rounded mb-3"
           data-test-product-picture
@@ -149,7 +150,7 @@ function formatDate(date: Date) {
           </div>
           <div class="card-body">
             <h6 class="card-subtitle mb-2 text-muted" data-test-countdown>
-              Temps restant : {{ timeLeft(product.endDate) }}
+              Temps restant : {{ timeLeft(product ? product.endDate : new Date() ) }}
             </h6>
           </div>
         </div>
@@ -160,10 +161,10 @@ function formatDate(date: Date) {
         <div class="row">
           <div class="col-lg-6">
             <h1 class="mb-3" data-test-product-name>
-              {{product.name}}
+              {{product?.name}}
             </h1>
           </div>
-          <div class="col-lg-6 text-end" v-if="product.sellerId == useAuthStore().userId.value">
+          <div class="col-lg-6 text-end" v-if="product?.sellerId == useAuthStore().userId.value">
             <RouterLink
               :to="{ name: 'ProductEdition', params: { productId: product.id } }"
               class="btn btn-primary"
@@ -180,20 +181,20 @@ function formatDate(date: Date) {
 
         <h2 class="mb-3">Description</h2>
         <p data-test-product-description>
-          {{product.description}}
+          {{product?.description}}
         </p>
 
         <h2 class="mb-3">Informations sur l'enchère</h2>
         <ul>
-          <li data-test-product-price>Prix de départ : {{product.originalPrice}} €</li>
-          <li data-test-product-end-date>Date de fin : {{formatDate(product.endDate)}}</li>
+          <li data-test-product-price>Prix de départ : {{product?.originalPrice}} €</li>
+          <li data-test-product-end-date>Date de fin : {{formatDate(product ? product.endDate : new Date() )}}</li>
           <li>
             Vendeur :
             <router-link
-              :to="{ name: 'User', params: { userId: product.sellerId } }"
+              :to="{ name: 'User', params: { userId: product?.sellerId } }"
               data-test-product-seller
             >
-              {{product.seller.username}}
+              {{product?.seller.username}}
             </router-link>
           </li>
         </ul>
@@ -209,7 +210,7 @@ function formatDate(date: Date) {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, i) in product.bids" :key="i" data-test-bid>
+            <tr v-for="(item, i) in product?.bids" :key="i" data-test-bid>
               <td>
                 <router-link
                   :to="{ name: 'User', params: { userId: item.bidder.id} }"
@@ -228,9 +229,9 @@ function formatDate(date: Date) {
             </tr>
           </tbody>
         </table>
-        <p data-test-no-bids v-if="product.bids.length == 0">Aucune offre pour le moment</p>
+        <p data-test-no-bids v-if="product?.bids.length == 0">Aucune offre pour le moment</p>
 
-        <form data-test-bid-form v-if="useAuthStore().userId.value != product.sellerId">
+        <form data-test-bid-form v-if="useAuthStore().userId.value != product?.sellerId">
           <div class="form-group">
             <label for="bidAmount">Votre offre :</label>
             <input

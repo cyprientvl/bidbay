@@ -34,6 +34,7 @@ function formatDate(value: Date): string {
 }
 
 function getPrice(item: HomeViewProduct): number{
+  console.log(item.bids.length + "ddf")
   if(item.bids.length == 0){
     return item.originalPrice;
   }else{
