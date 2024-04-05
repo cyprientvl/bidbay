@@ -14,6 +14,7 @@ interface HomeViewProduct extends Product{
 
 const loading = ref(false);
 const error = ref(false);
+const searchTerm = ref<string>("");
 const selectedFilter = ref<string>("");
 let list = ref<HomeViewProduct[]>([])
 let sortNameList = ref<HomeViewProduct[]>([])
@@ -45,15 +46,23 @@ function getPrice(item: HomeViewProduct): number{
   }
 }
 
+const filteredProducts = computed(() => {
+  if (searchTerm.value) {
+    return list.value.filter(product => product.name.includes(searchTerm.value));
+  } else {
+    return list.value;
+  }
+});
+
 const sortedProducts = computed(() => {
   if (selectedFilter.value === "Nom") {
     console.log("name")
-    return [...list.value].sort((a, b) => a.name.localeCompare(b.name));
+    return [...filteredProducts.value].sort((a, b) => a.name.localeCompare(b.name));
   } else if (selectedFilter.value === "Prix") {
     console.log("price")
-    return [...list.value].sort((a, b) => getPrice(a) - getPrice(b));
+    return [...filteredProducts.value].sort((a, b) => getPrice(a) - getPrice(b));
   } else {
-    return list.value;
+    return filteredProducts.value;
   }
 });
 fetchProducts();
@@ -73,6 +82,7 @@ fetchProducts();
               type="text"
               class="form-control"
               placeholder="Filtrer par nom"
+              v-model="searchTerm"
               data-test-filter
             />
           </div>
