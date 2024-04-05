@@ -44,7 +44,7 @@ async function saveProduct(){
   try{
     product.value.endDate = new Date(productEndDate.value);
     await queryPut(`products/${productId.value}`, product.value);
-    router.push(`/products/${productId}`)
+    router.push(`/products/${productId.value}`)
     error.value = false;
   }catch(e){
     error.value = true;
