@@ -2,12 +2,10 @@
 import { ref, computed } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
 import { useAuthStore } from "../store/auth";
-import { flatMap } from "cypress/types/lodash";
 import { Product } from "@/models/product";
 import { User } from "@/models/user";
 import { queryDelete, queryGet, queryPost } from "@/utils/queryAPI";
 import { Bid } from "@/models/bid";
-const { isAuthenticated, isAdmin, userData, token } = useAuthStore();
 
 interface ViewProduct extends Product{
   bids: ViewProductBid[];
@@ -36,7 +34,7 @@ const product = ref<ViewProduct>({
 const route = useRoute();
 const router = useRouter();
 
-const loading = ref(false);
+const loading = ref(true);
 const error = ref(false);
 
 const productId = ref(route.params.productId);
@@ -49,8 +47,9 @@ async function getProduct(){
     loading.value = true;
     const responses = await queryGet<ViewProduct>(`products/${productId.value}`);
     product.value = responses;
-    console.log(product.value);
+    newPrice.value = getMaxBid()+1; 
     error.value = false;
+
   }catch(e){
     error.value = true;
   }finally{
@@ -70,7 +69,8 @@ function timeLeft(date: Date){
     const jours = Math.floor(differenceEnMilliseconds / (1000 * 60 * 60 * 24));
     const heures = Math.floor((differenceEnMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((differenceEnMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
-    return `${jours}j ${heures}h ${minutes}min`
+    const seconde = Math.floor((differenceEnMilliseconds % (1000 * 60))/1000)
+    return `${jours}j ${heures}h ${minutes}min ${seconde}s`
 }
 
 function getMaxBid(): number{
@@ -83,10 +83,19 @@ function getMaxBid(): number{
   return max
 }
 
-async function addBid(){
-  if(newPrice.value < 10 && newPrice.value <= getMaxBid()) return;
+const formattedTimeLeft = ref(timeLeft(product.value.endDate)); 
 
+const intervalId = setInterval(() => {
+    formattedTimeLeft.value = timeLeft(product.value.endDate); 
+  }, 1000);
+
+async function addBid(){
   loading.value = true
+
+  if(newPrice.value < 10 && newPrice.value <= getMaxBid()){
+    loading.value = false
+    return;
+  }
   try{
     await queryPost(`products/${product.value.id}/bids`, {price: newPrice.value})
     error.value = false;
@@ -146,7 +155,7 @@ function formatDate(date: Date) {
     <div class="alert alert-danger mt-4" role="alert" data-test-error v-if="error">
       Une erreur est survenue lors du chargement des produits.
     </div>
-    <div class="row" data-test-product v-if="!loading">
+    <div class="row" data-test-product v-if="!loading && !error">
       <!-- Colonne de gauche : image et compte à rebours -->
       <div class="col-lg-4">
         <img
@@ -161,7 +170,7 @@ function formatDate(date: Date) {
           </div>
           <div class="card-body">
             <h6 class="card-subtitle mb-2 text-muted" data-test-countdown>
-              Temps restant : {{ timeLeft(product.endDate) }}
+              Temps restant : {{formattedTimeLeft}}
             </h6>
           </div>
         </div>
@@ -210,7 +219,7 @@ function formatDate(date: Date) {
           </li>
         </ul>
         <h2 class="mb-3">Offres sur le produit</h2>
-        <table class="table table-striped" data-test-bids v-if="product.bids.length != 0">
+        <table class="table table-striped" data-test-bids v-if="product.bids && product.bids.length != 0">
           <thead>
             <tr>
               <th scope="col">Enchérisseur</th>
@@ -239,7 +248,7 @@ function formatDate(date: Date) {
             </tr>
           </tbody>
         </table>
-        <p data-test-no-bids v-if="product.bids.length == 0">Aucune offre pour le moment</p>
+        <p data-test-no-bids v-if="product.bids && product.bids.length == 0">Aucune offre pour le moment</p>
 
         <form data-test-bid-form v-if="useAuthStore().userId.value != product.sellerId">
           <div class="form-group">

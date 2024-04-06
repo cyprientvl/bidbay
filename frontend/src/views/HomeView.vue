@@ -30,7 +30,8 @@ async function fetchProducts() {
 }
 
 function formatDate(value: Date): string {
-      return new Date(value).toLocaleDateString();
+      if(new Date().getTime() > new Date(value).getTime()) return "Terminé"
+      return "En cours jusqu'au " +new Date(value).toLocaleDateString();
 }
 
 function getPrice(item: HomeViewProduct): number{
@@ -43,27 +44,7 @@ function getPrice(item: HomeViewProduct): number{
 }
 
 
-function doFilterName(value: string) {
-  if (value === "") {
-    fetchProducts();
-    return;
-  }
 
-  list.value = list.value.filter((item) => {
-    return item.name.toLowerCase().includes(value.toLowerCase());
-  });
-}
-
-function doFilterPrice(value: number) {
-  if (value === 0) {
-    fetchProducts();
-    return;
-  }
-
-  list.value = list.value.filter((item) => {
-    return item.originalPrice.toLowerCase().includes(value.toLowerCase());
-  });
-}
 
 fetchProducts();
 </script>
@@ -120,7 +101,7 @@ fetchProducts();
     <div class="alert alert-danger mt-4" role="alert" v-if="error" data-test-error>
       Une erreur est survenue lors du chargement des produits.
     </div>
-    <div class="row">
+    <div class="row" v-if="!loading && !error">
       <div class="col-md-4 mb-4" v-for="(item, i) in list" data-test-product :key="i">
         <div class="card">
           <RouterLink :to="{ name: 'Product', params: { productId: item.id } }">
@@ -152,7 +133,7 @@ fetchProducts();
               </RouterLink>
             </p>
             <p class="card-text" data-test-product-date>
-              En cours jusqu'au {{ formatDate(item.endDate) }}
+              {{ formatDate(item.endDate) }}
             </p>
             <p class="card-text" data-test-product-price>Prix actuel : {{getPrice(item)}} €</p>
           </div>

@@ -9,7 +9,7 @@ const router = express.Router()
   
 router.get('/api/products', async (req, res, next) => {
   try{
-    const products = await Product.findAll({ attributes: ['id', 'name', 'description', 'category', 'originalPrice', 'pictureUrl', 'endDate', 'sellerId'], include: ['seller', {model: Bid, as: 'bids', order:  ['price', 'DESC']}]})
+    const products = await Product.findAll({ order: [['endDate', 'DESC']], attributes: ['id', 'name', 'description', 'category', 'originalPrice', 'pictureUrl', 'endDate', 'sellerId'], include: ['seller', {model: Bid, as: 'bids', order:  ['price', 'DESC']}]})
     return res.status(200).json(products);
   }catch(e){
     return res.status(500).json({error: "Internal server error"})
