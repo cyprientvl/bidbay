@@ -1,10 +1,11 @@
 import express from 'express'
+import { Request } from 'express'
 import { User, Product, Bid } from '../orm/index'
 import { MissingUser } from '../error/error'
 
 const router = express.Router()
 
-router.get('/api/users/:userId', async (req, res) => {
+router.get('/api/users/:userId', async (req: Request<{userId: string}, {}, {}, {}>, res) => {
 
   try{
     const { userId } = req.params;

@@ -8,22 +8,26 @@ import { User } from "@/models/user";
 interface HomeViewProduct extends Product{
   bids: Bid[];
   seller: User;
+  name: string;
 }
 
-const loading = ref(false);
-const error = ref(false);
+
+
+const loading = ref(true);
+const error = ref("");
+const searchTerm = ref<string>("");
+const selectedFilter = ref<string>("nom");
 let list = ref<HomeViewProduct[]>([])
+
 
 async function fetchProducts() {
   loading.value = true;
-  error.value = false;
-
+  error.value = "";
   try {
     const response = await queryGet<HomeViewProduct[]>("products");
     list.value = response;
-    error.value = false;
   } catch (e) {
-    error.value = true;
+    error.value = "Une erreur est survenue lors du chargement des produits.";
   } finally {
     loading.value = false;
   }
@@ -35,7 +39,6 @@ function formatDate(value: Date): string {
 }
 
 function getPrice(item: HomeViewProduct): number{
-  console.log(item.bids.length + "ddf")
   if(item.bids.length == 0){
     return item.originalPrice;
   }else{
@@ -43,25 +46,52 @@ function getPrice(item: HomeViewProduct): number{
   }
 }
 
+function getTextPrice(item: HomeViewProduct){
+  if(item.bids.length == 0){
+    return "Prix de départ : ";
+  }else{
+    return "Prix actuel : ";
+  }
+}
 
+const filteredProducts = computed(() => {
+  if (searchTerm.value) {
+    return list.value.filter(product => product.name.toLowerCase().includes(searchTerm.value.toLowerCase()));
+  } else {
+    return list.value;
+  }
+});
 
+const sortedProducts = computed(() => {
+  if (selectedFilter.value === "nom") {
+    console.log("name")
+    return [...filteredProducts.value].sort((a, b) => a.name.localeCompare(b.name));
+  } else if (selectedFilter.value === "prix") {
+    console.log("price")
+    return [...filteredProducts.value].sort((a, b) => getPrice(a) - getPrice(b));
+  } else {
+    return filteredProducts.value;
+  }
+});
 
 fetchProducts();
 </script>
 
 <template>
   <div>
-    <h1 class="text-center mb-4">Liste des produits</h1>
+    <h1 class="text-center mb-4" >Liste des produits</h1>
 
     <div class="row mb-3">
       <div class="col-md-6">
         <form>
           <div class="input-group">
+            
             <span class="input-group-text">Filtrage</span>
             <input
               type="text"
               class="form-control"
               placeholder="Filtrer par nom"
+              v-model="searchTerm"
               data-test-filter
             />
           </div>
@@ -76,14 +106,15 @@ fetchProducts();
             aria-expanded="false"
             data-test-sorter
           >
-            Trier par nom
+            Trier par {{ selectedFilter ? selectedFilter : 'nom' }}
           </button>
+
           <ul class="dropdown-menu dropdown-menu-end">
             <li>
-              <a class="dropdown-item" href="#"> Nom </a>
+              <a class="dropdown-item" href="#" @click="selectedFilter = 'nom'"> Nom </a>
             </li>
             <li>
-              <a class="dropdown-item" href="#" data-test-sorter-price>
+              <a class="dropdown-item" href="#" @click="selectedFilter = 'prix'" data-test-sorter-price>
                 Prix
               </a>
             </li>
@@ -98,11 +129,11 @@ fetchProducts();
       </div>
     </div>
 
-    <div class="alert alert-danger mt-4" role="alert" v-if="error" data-test-error>
-      Une erreur est survenue lors du chargement des produits.
+    <div class="alert alert-danger mt-4" role="alert" data-test-error v-if="error" >
+      {{error}}
     </div>
-    <div class="row" v-if="!loading && !error">
-      <div class="col-md-4 mb-4" v-for="(item, i) in list" data-test-product :key="i">
+    <div class="row" v-if="list.length > 0">
+      <div class="col-md-4 mb-4" v-for="(item, i) in sortedProducts" data-test-product :key="i">
         <div class="card">
           <RouterLink :to="{ name: 'Product', params: { productId: item.id } }">
             <img
@@ -125,7 +156,7 @@ fetchProducts();
             </p>
             <p class="card-text">
               Vendeur :
-              <RouterLink
+              <RouterLink v-if="item.seller"
                 data-test-product-seller
                 :to="{ name: 'User', params: { userId: item.seller.id } }"
               >
@@ -135,7 +166,7 @@ fetchProducts();
             <p class="card-text" data-test-product-date>
               {{ formatDate(item.endDate) }}
             </p>
-            <p class="card-text" data-test-product-price>Prix actuel : {{getPrice(item)}} €</p>
+            <p class="card-text" v-if="item.bids !== undefined" data-test-product-price>{{getTextPrice(item)}} {{getPrice(item)}} €</p>
           </div>
         </div>
       </div>

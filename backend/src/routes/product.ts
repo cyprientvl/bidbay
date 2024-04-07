@@ -1,5 +1,5 @@
 import express from 'express'
-
+import { Request, Response } from 'express'
 import { Product, Bid, User } from '../orm/index'
 import authMiddleware from '../middlewares/auth'
 import { MissingProduct, UserNotGranted } from '~/error/error'
@@ -7,7 +7,7 @@ import { validateRequestBody } from '~/middlewares/body'
 
 const router = express.Router()
   
-router.get('/api/products', async (req, res, next) => {
+router.get('/api/products', async (req: Request<{},{},{}, {}>, res: Response) => {
   try{
     const products = await Product.findAll({ order: [['endDate', 'DESC']], attributes: ['id', 'name', 'description', 'category', 'originalPrice', 'pictureUrl', 'endDate', 'sellerId'], include: ['seller', {model: Bid, as: 'bids', order:  ['price', 'DESC']}]})
     return res.status(200).json(products);
@@ -17,10 +17,9 @@ router.get('/api/products', async (req, res, next) => {
   
 })
 
-router.get('/api/products/:productId',  async (req, res) => {
+router.get('/api/products/:productId',  async (req: Request<{ productId: string }, {}, {}>, res) => {
   try {
     const { productId } = req.params;
-
     const products = await Product.findByPk(productId, {
       include: [{model: User,as: 'seller',attributes: ['id', 'username']}, {model: Bid, as: 'bids', attributes: ['id', 'price', 'date'], include: [{model: User, as: 'bidder', attributes: ['id', 'username']}]}]
     });
@@ -38,7 +37,7 @@ router.get('/api/products/:productId',  async (req, res) => {
 })
 
 router.post('/api/products', authMiddleware, validateRequestBody(["name", "description", "category", "originalPrice", "pictureUrl", "endDate"]), 
-async(req, res) => {
+async(req: Request<{}, {}, {name: string, description: string, category: string, originalPrice: number, pictureUrl: string, endDate: string}, {}>, res: Response) => {
   try {
     const productData = {
       name: req.body.name,
@@ -59,9 +58,8 @@ async(req, res) => {
 });
 
 
-router.put('/api/products/:productId', authMiddleware, async (req, res) =>
+router.put('/api/products/:productId', authMiddleware, async (req: Request<{productId: string}, {}, {}, {}>, res: Response) =>
 {
-  console.log(req.body)
   try {
 
     let product = await Product.findByPk(req.params.productId);
@@ -91,7 +89,7 @@ router.put('/api/products/:productId', authMiddleware, async (req, res) =>
 
 
 
-router.delete('/api/products/:productId', authMiddleware, async (req, res) =>
+router.delete('/api/products/:productId', authMiddleware, async (req: Request<{productId: string}, {}, {}, {}>, res: Response) =>
 {
   try {
     

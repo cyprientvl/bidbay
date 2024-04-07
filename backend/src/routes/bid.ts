@@ -1,18 +1,19 @@
 import authMiddleware from '../middlewares/auth'
 import { Bid, Product } from '../orm/index'
 import express from 'express'
+import { Request, Response } from 'express'
 import { getDetails } from '../validators/index'
 import { MissingBid, MissingProduct, UserNotGranted } from '~/error/error'
 import { validateRequestBody } from '~/middlewares/body'
 
 const router = express.Router()
 
-router.delete('/api/bids/:bidId', authMiddleware, async (req, res) => {
+router.delete('/api/bids/:bidId', authMiddleware, async (req: Request<{bidId: string}, {}, {}, {}>, res: Response) => {
   
   try{
     const { bidId } = req.params;
 
-    let bid = await Bid.findByPk(req.params.bidId);
+    let bid = await Bid.findByPk(bidId);
     if(!bid) throw new MissingBid();
 
     if(bid.bidderId != req.user.id && !req.user.admin) throw new UserNotGranted()
@@ -34,7 +35,8 @@ router.delete('/api/bids/:bidId', authMiddleware, async (req, res) => {
  
 })
 
-router.post('/api/products/:productId/bids', authMiddleware, validateRequestBody(["price"]), async (req, res) => {
+router.post('/api/products/:productId/bids', authMiddleware, validateRequestBody(["price"]), 
+async (req: Request<{productId: string}, {}, {price: number}, {}>, res: Response) => {
 
   try{
 
