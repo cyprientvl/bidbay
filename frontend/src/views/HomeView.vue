@@ -14,7 +14,7 @@ interface HomeViewProduct extends Product{
 
 
 const loading = ref(true);
-const error = ref("");
+const error = ref(true);
 const searchTerm = ref<string>("");
 const selectedFilter = ref<string>("nom");
 let list = ref<HomeViewProduct[]>([])
@@ -22,12 +22,16 @@ let list = ref<HomeViewProduct[]>([])
 
 async function fetchProducts() {
   loading.value = true;
-  error.value = "";
+  error.value = false;
   try {
     const response = await queryGet<HomeViewProduct[]>("products");
     list.value = response;
+    error.value = false;
+    if (response.length === 0) {
+      error.value = true;
+    }
   } catch (e) {
-    error.value = "Une erreur est survenue lors du chargement des produits.";
+    error.value = true;
   } finally {
     loading.value = false;
   }
@@ -129,7 +133,7 @@ fetchProducts();
       </div>
     </div>
 
-    <div class="alert alert-danger mt-4" role="alert" data-test-error v-if="error" >
+    <div class="alert alert-danger mt-4" role="alert" data-test-error v-if="(error )" >
       {{error}}
     </div>
     <div class="row" v-if="list.length > 0">
