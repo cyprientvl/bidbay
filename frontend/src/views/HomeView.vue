@@ -4,6 +4,7 @@ import { queryGet } from "@/utils/queryAPI";
 import { Bid } from "@/models/bid";
 import { Product } from "@/models/product";
 import { User } from "@/models/user";
+import axios from "axios";
 
 interface HomeViewProduct extends Product{
   bids: Bid[];
@@ -20,22 +21,24 @@ const selectedFilter = ref<string>("nom");
 let list = ref<HomeViewProduct[]>([])
 
 
-async function fetchProducts() {
-  loading.value = true;
-  error.value = false;
-  try {
-    const response = await queryGet<HomeViewProduct[]>("products");
-    list.value = response;
-    error.value = false;
-    if (response.length === 0) {
-      error.value = true;
-    }
+ async function fetchProducts() {
+   loading.value = true;
+   error.value = false;
+   try {
+     const response = await queryGet<HomeViewProduct[]>("products");
+      list.value = response;
+      error.value = false;
+
+      if(!list.value.length){
+        throw new Error("No data found");
+      }
+
   } catch (e) {
-    error.value = true;
-  } finally {
-    loading.value = false;
-  }
-}
+     error.value = true;
+   } finally {
+     loading.value = false;
+   }
+ }
 
 function formatDate(value: Date): string {
       if(new Date().getTime() > new Date(value).getTime()) return "Terminé"
