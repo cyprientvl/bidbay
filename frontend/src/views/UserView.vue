@@ -24,7 +24,7 @@ interface UserViewBids extends Bid{
 
 const route = useRoute();
 
-const user = ref<User>({} as User);
+const user = ref<User>({id: "", admin: false, username: "", products: [], bids: [], email: ""});
 const loading = ref(false);
 const error = ref(false);
 
