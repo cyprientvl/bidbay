@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-
+import { queryGet } from "@/utils/queryAPI";
 import { useAuthStore } from "../store/auth";
 
 const { isAuthenticated, userData } = useAuthStore();
@@ -18,23 +18,25 @@ let userId = computed(() => route.params.userId);
 async function fetchUser(idUser) {
   loading.value = true;
   error.value = false;
-  let str;
-  if (idUser === "me") {
-    str = "http://localhost:3000/api/users/" + userData.value.id;
-  } else {
-    str = "http://localhost:3000/api/users/" + idUser;
+
+  try{
+    let id;
+    if (idUser === "me") {
+      id = userData.value.id;
+    } else {
+      id = id = idUser;
+    }
+  
+    const response = await queryGet(`users/${id}`);
+    console.log(response)
+    user.value = response;
+  }catch(e){
+    console.log(e);
+    error.value = true;
+  }finally {
+    loading.value = false;
   }
 
-  try {
-    const response = await fetch(str);
-    user.value = await response.json();
-    loading.value = false;
-  } catch (e) {
-    error.value = true;
-    console.log(e);
-  } finally {
-    loading.value = false;
-  }
 }
 
 if (!isAuthenticated) {
