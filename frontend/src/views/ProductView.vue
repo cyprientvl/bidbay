@@ -41,7 +41,7 @@ const productId = ref(route.params.productId);
 
 const newPrice = ref<number>(10);
 
-async function getProduct(){
+async function getProduct() : Promise<void>{
 
   try{
     loading.value = true;
@@ -59,7 +59,7 @@ async function getProduct(){
 
 const reversed = computed(() => newPrice.value > getMaxBid() && newPrice.value > getMaxBid())
 
-function timeLeft(date: Date){
+function timeLeft(date: Date) : string {
     const d = new Date(date);
     const maintenant = new Date();
 
@@ -107,7 +107,7 @@ async function addBid(){
   }
 }
 
-async function deleteProduct() {
+async function deleteProduct() : Promise<void>{
   loading.value = true;
   try{
     await queryDelete(`products/${product.value.id}`)
@@ -120,7 +120,7 @@ async function deleteProduct() {
   }
 }
 
-async function deleteBid(id: string, index: number){
+async function deleteBid(id: string, index: number) : Promise<void>{
   loading.value = true;
   try{
     await queryDelete(`bids/${id}`)
@@ -135,9 +135,7 @@ async function deleteBid(id: string, index: number){
 
 getProduct();
 
-/**
- * @param {number|string|Date|VarDate} date
- */
+
 function formatDate(date: Date) {
   const options: any = { year: "numeric", month: "long", day: "numeric" };
   return new Date(date).toLocaleDateString("fr-FR", options);

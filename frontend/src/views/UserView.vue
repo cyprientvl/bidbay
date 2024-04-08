@@ -24,13 +24,14 @@ interface UserViewBids extends Bid{
 
 const route = useRoute();
 
+
 const user = ref<User>({id: "", admin: false, username: "", products: [], bids: [], email: ""});
 const loading = ref(false);
 const error = ref(false);
 
 let userId = computed(() => route.params.userId);
 
-async function fetchUser(idUser: string) {
+async function fetchUser(idUser: string) : Promise<void> {
   loading.value = true;
   error.value = false;
 
@@ -39,7 +40,7 @@ async function fetchUser(idUser: string) {
     if (idUser === "me") {
       id = userData.value?.id;
     } else {
-      id = id = idUser;
+      id = idUser;
     }
   
     const response = await queryGet<User>(`users/${id}`);
