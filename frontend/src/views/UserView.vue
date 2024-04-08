@@ -1,34 +1,49 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { queryGet } from "@/utils/queryAPI";
 import { useAuthStore } from "../store/auth";
-
+import { Product } from "@/models/product";
+import { Bid } from "@/models/bid";
 const { isAuthenticated, userData } = useAuthStore();
 
-const router = useRouter();
+interface User{
+  admin: boolean,
+  email: string,
+  id: string,
+  username: string
+  products: Product[],
+  bids: UserViewBids[]
+
+}
+
+interface UserViewBids extends Bid{
+  product: {id: string, name: string}
+}
+
+
 const route = useRoute();
 
-const user = ref(null);
+const user = ref<User>({} as User);
 const loading = ref(false);
-const error = ref(null);
+const error = ref(false);
 
 let userId = computed(() => route.params.userId);
 
-async function fetchUser(idUser) {
+async function fetchUser(idUser: string) {
   loading.value = true;
   error.value = false;
 
   try{
     let id;
     if (idUser === "me") {
-      id = userData.value.id;
+      id = userData.value?.id;
     } else {
       id = id = idUser;
     }
   
-    const response = await queryGet(`users/${id}`);
-    console.log(response)
+    const response = await queryGet<User>(`users/${id}`);
+    console.log(response);
     user.value = response;
   }catch(e){
     console.log(e);
@@ -44,7 +59,7 @@ if (!isAuthenticated) {
 }
 
 if (window.location.href.startsWith("http://localhost:5173/users/")) {
-  let userId;
+  let userId = "";
   if (window.location.href.includes("me")) {
     fetchUser("me");
   } else {
