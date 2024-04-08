@@ -10,49 +10,54 @@ const router = useRouter();
 const error = ref(false);
 const loading = ref(false);
 
-
-const inputProductName = ref<string>("");
-const inputProductDescription = ref<string>("");
-const inputProductCategorie = ref<string>("");
-const inputProductStartPrice = ref<number>(0);
-const inputProductUrl = ref<string>("");
-const inputProductEndDate = ref<string>("");
-
+const inputProductName = ref("");
+const inputProductDescription = ref("");
+const inputProductCategorie = ref("");
+const inputProductStartPrice = ref(0);
+const inputProductUrl = ref("");
+const inputProductEndDate = ref("");
 
 if (!isAuthenticated.value) {
   router.push({ name: "Login" });
 }
-async function addProduct(){
-  try{
+
+async function addProduct(): Promise<void> {
+  try {
     loading.value = true;
-    const response = await queryPost<Product>("products", {name: inputProductName.value, description: inputProductDescription.value,category: inputProductCategorie.value,originalPrice: inputProductStartPrice.value ,pictureUrl: inputProductUrl.value ,endDate: inputProductEndDate.value})
+    const response = await queryPost<Product>("products", {
+      name: inputProductName.value,
+      description: inputProductDescription.value,
+      category: inputProductCategorie.value,
+      originalPrice: inputProductStartPrice.value,
+      pictureUrl: inputProductUrl.value,
+      endDate: inputProductEndDate.value
+    });
     console.log(response);
-    router.push(`/products/${response.id}`)
-    
+    router.push(`/products/${response.id}`);
     error.value = false;
-  }catch(e){
+  } catch (e) {
     error.value = true;
-  }finally{
+  } finally {
     loading.value = false;
   }
 }
 
-const reversed = computed(() =>{
-
-  if(inputProductCategorie.value.trim() != "" 
-  && inputProductDescription.value.trim() != ""
-  && inputProductCategorie.value.trim() != ""
-  && inputProductStartPrice.value != 0
-  && inputProductUrl.value.trim() != ""
-  && inputProductEndDate.value.trim() != ""
-  && loading.value == false
-  ) return true;
-  return false
-
-} )
-
-
+const reversed = computed(() => {
+  if (
+    inputProductCategorie.value.trim() !== "" &&
+    inputProductDescription.value.trim() !== "" &&
+    inputProductCategorie.value.trim() !== "" &&
+    inputProductStartPrice.value !== 0 &&
+    inputProductUrl.value.trim() !== "" &&
+    inputProductEndDate.value.trim() !== "" &&
+    !loading.value
+  ) {
+    return true;
+  }
+  return false;
+});
 </script>
+
 
 <template>
   <h1 class="text-center">Ajouter un produit</h1>

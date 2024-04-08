@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { queryGet } from "@/utils/queryAPI";
@@ -15,7 +15,7 @@ const error = ref(null);
 
 let userId = computed(() => route.params.userId);
 
-async function fetchUser(idUser) {
+async function fetchUser(idUser : string) {
   loading.value = true;
   error.value = false;
 
