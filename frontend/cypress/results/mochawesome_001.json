@@ -5,9 +5,9 @@
     "passes": 1,
     "pending": 0,
     "failures": 0,
-    "start": "2024-04-08T12:27:40.368Z",
-    "end": "2024-04-08T12:27:40.426Z",
-    "duration": 58,
+    "start": "2024-04-08T13:45:05.305Z",
+    "end": "2024-04-08T13:45:05.349Z",
+    "duration": 44,
     "testsRegistered": 1,
     "passPercent": 100,
     "pendingPercent": 0,
@@ -18,7 +18,7 @@
   },
   "results": [
     {
-      "uuid": "df6cf703-71ff-4efe-a377-613094b64877",
+      "uuid": "4e48cb0b-9826-4885-9c00-464b4a067d98",
       "title": "",
       "fullFile": "cypress\\e2e\\meta\\authors.cy.js",
       "file": "cypress\\e2e\\meta\\authors.cy.js",
@@ -27,7 +27,7 @@
       "tests": [],
       "suites": [
         {
-          "uuid": "1ac54ef5-d83d-4aa3-b1d9-0cf16aa3bef6",
+          "uuid": "f7b87851-8878-4ab5-af75-a1c61caf07a9",
           "title": "Meta",
           "fullFile": "",
           "file": "",
@@ -38,7 +38,7 @@
               "title": "Remplisser les infos de votre groupe dans frontend/meta/authors.js",
               "fullTitle": "Meta Remplisser les infos de votre groupe dans frontend/meta/authors.js",
               "timedOut": null,
-              "duration": 24,
+              "duration": 25,
               "state": "passed",
               "speed": "fast",
               "pass": true,
@@ -47,20 +47,20 @@
               "context": null,
               "code": "expect(_authors.authors).to.not.deep.eq([\"John Doe (p12345678)\", \"Jane Doe (p12345678)\"]);\nexpect(_authors.group).to.oneOf([1, 2, 3]);",
               "err": {},
-              "uuid": "c3333824-d4d9-4bb2-a573-4c13182b8859",
-              "parentUUID": "1ac54ef5-d83d-4aa3-b1d9-0cf16aa3bef6",
+              "uuid": "0c046b26-ae2c-442d-b311-441a6aedec57",
+              "parentUUID": "f7b87851-8878-4ab5-af75-a1c61caf07a9",
               "isHook": false,
               "skipped": false
             }
           ],
           "suites": [],
           "passes": [
-            "c3333824-d4d9-4bb2-a573-4c13182b8859"
+            "0c046b26-ae2c-442d-b311-441a6aedec57"
           ],
           "failures": [],
           "pending": [],
           "skipped": [],
-          "duration": 24,
+          "duration": 25,
           "root": false,
           "rootEmpty": false,
           "_timeout": 2000
